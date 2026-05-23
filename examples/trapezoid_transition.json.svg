@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect x="0" y="0" width="100" height="100" fill="#fafafa"/>
+  <polygon fill="none" stroke="#111111" stroke-width="0.45" stroke-linejoin="round" points="6,28 94,28 94,72 6,31.6667"/>
+  <g stroke="#2563eb" stroke-width="0.9" stroke-linecap="round">
+    <line x1="72" y1="28" x2="86.667" y2="28"/>
+    <line x1="86.667" y1="68.639" x2="72" y2="61.9167"/>
+    <line x1="42.667" y1="28" x2="57.333" y2="28"/>
+    <line x1="57.333" y1="55.1943" x2="42.667" y2="48.4724"/>
+    <line x1="28" y1="28" x2="28" y2="41.75"/>
+    <line x1="13.333" y1="28" x2="13.333" y2="35.0276"/>
+  </g>
+  <g fill="#111111">
+    <circle cx="13.333" cy="28" r="0.95"/>
+    <circle cx="28" cy="28" r="0.95"/>
+    <circle cx="42.667" cy="28" r="0.95"/>
+    <circle cx="57.333" cy="28" r="0.95"/>
+    <circle cx="72" cy="28" r="0.95"/>
+    <circle cx="86.667" cy="28" r="0.95"/>
+    <circle cx="86.667" cy="68.639" r="0.95"/>
+    <circle cx="72" cy="61.9167" r="0.95"/>
+    <circle cx="57.333" cy="55.1943" r="0.95"/>
+    <circle cx="42.667" cy="48.4724" r="0.95"/>
+    <circle cx="28" cy="41.75" r="0.95"/>
+    <circle cx="13.333" cy="35.0276" r="0.95"/>
+  </g>
+</svg>
