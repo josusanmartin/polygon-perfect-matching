@@ -97,11 +97,10 @@ Pass `--svg` to write a normalized 100×100 figure alongside the input file (`<i
 
 | input size | recommended algorithm | why |
 | ---: | --- | --- |
-| `N ≤ 12` | **brute force** or **interval DP** | both finish in microseconds; brute force is the simplest oracle. |
-| `12 ≤ N ≤ 100` | **interval DP** | smallest constants of any algorithm in this regime — beats both MS variants by 2–4× on raw wall-clock. |
-| `100 ≤ N ≤ 1500` | **Marcotte & Suri (simple scan)** | the `O(N²)` scan has tighter constants than SMAWK's recursion + allocation overhead until the asymptotics catch up. |
-| `N ≥ 2000` | **Marcotte & Suri (SMAWK, the default)** | the `O(N log N)` bound starts to dominate; ~2× faster than scan at `N = 4000`, ~13× at `N = 20000`. |
-| `N ≥ ~2000`, exact reproducibility wanted | **DP** *and* **MS** in validation mode | every release run cross-checks all four algorithms on the same inputs. |
+| `N ≤ ~20` | **brute force** or **interval DP** | both finish in microseconds; brute force is the simplest oracle, DP is fastest by a hair. |
+| `~20 ≤ N ≤ ~400` | **Marcotte & Suri (simple scan)** | smallest constants in this band; beats DP starting around `N ≈ 30` and beats SMAWK up to `N ≈ 400`. |
+| `N ≥ ~500` | **Marcotte & Suri (SMAWK, the default)** | the `O(N log N)` bound starts to dominate; ~5× faster than scan at `N = 4000`, ~32× at `N = 20000`. |
+| `N ≥ ~500`, exact reproducibility wanted | run **MS (scan)** *and* **MS (SMAWK)** in validation mode | every release run cross-checks all four algorithms on the same inputs. |
 
 The four implementations are:
 
@@ -197,26 +196,26 @@ Benchmark flags: `-t`, `-m`, `-e`, `--seed`, `--simple-scan`, `--skip-dp`,
 
 ## Empirical performance
 
-Per-trial averages on Apple Clang 17 / `-O3` (Release, Apple M4 Max), measured with the `--exact-points` flag so every trial uses the same `N`. All four algorithms were run on every `N` for which they were tractable; brute force is capped at `N ≤ 20` and DP is skipped above `N = 2000` to keep the sweep short.  Each cell is the mean wall-clock time for a single matching call.
+Per-trial averages on Apple Clang 17 / `-O3` (Release, Apple M4 Max), measured with the `--exact-points` flag so every trial uses the same `N`. All four algorithms were run on every `N` for which they were tractable; brute force is capped at `N ≤ 20` and DP is skipped above `N = 2000` to keep the sweep short. Each cell is the mean wall-clock time for a single matching call.
 
 |     N | trials |       BF |       DP | Paper (scan) | Paper (SMAWK) |
 | ----: | -----: | -------: | -------: | -----------: | ------------: |
-|     4 |   5000 |  0.15 μs |  0.53 μs |      0.48 μs |       0.86 μs |
-|     8 |   2000 |  0.82 μs |  0.76 μs |      1.40 μs |       2.21 μs |
-|    12 |   1000 |  12.2 μs |  1.14 μs |      2.50 μs |       3.97 μs |
-|    16 |    200 |   353 μs |  1.63 μs |      4.11 μs |       6.87 μs |
-|    20 |     30 |  7.77 ms |  3.25 μs |      8.97 μs |       13.5 μs |
-|    50 |    500 |        – |  11.1 μs |      12.0 μs |       22.5 μs |
-|   100 |    300 |        – |  62.1 μs |      25.5 μs |       47.6 μs |
-|   200 |    100 |        – |   453 μs |      57.7 μs |        105 μs |
-|   500 |     30 |        – |  8.26 ms |       194 μs |        272 μs |
-|  1000 |     10 |        – |  73.7 ms |       535 μs |        569 μs |
-|  2000 |      3 |        – |   954 ms |      1.72 ms |       1.14 ms |
-|  4000 |      3 |        – |    skip  |      5.05 ms |       2.20 ms |
-|  8000 |     10 |        – |    skip  |      21.7 ms |       4.81 ms |
-| 20000 |      5 |        – |    skip  |       153 ms |       11.4 ms |
+|     4 |   5000 |  0.12 μs |  0.17 μs |      0.20 μs |       0.20 μs |
+|     8 |   2000 |  0.85 μs |  0.23 μs |      0.42 μs |       0.56 μs |
+|    12 |   1000 |  14.2 μs |  0.39 μs |      0.72 μs |       1.08 μs |
+|    16 |    200 |   355 μs |  0.79 μs |      1.06 μs |       2.20 μs |
+|    20 |     30 |  7.83 ms |  1.84 μs |      2.03 μs |       4.67 μs |
+|    50 |    500 |        – |  6.62 μs |      3.40 μs |       5.45 μs |
+|   100 |    300 |        – |  46.1 μs |      8.70 μs |       13.5 μs |
+|   200 |    100 |        – |   329 μs |      22.5 μs |       31.5 μs |
+|   500 |     30 |        – |  6.02 ms |       106 μs |       97.1 μs |
+|  1000 |     10 |        – |  52.9 ms |       369 μs |        203 μs |
+|  2000 |      3 |        – |   484 ms |      1.44 ms |        431 μs |
+|  4000 |      3 |        – |    skip  |      4.40 ms |        870 μs |
+|  8000 |     10 |        – |    skip  |      20.4 ms |       2.08 ms |
+| 20000 |      5 |        – |    skip  |       152 ms |       4.76 ms |
 
-Sweep command (≈11 s wall-clock for the full table):
+Sweep command (≈5 s wall-clock for the full table):
 
 ```bash
 for N in 4 8 12 16 20 50 100 200 500 1000 2000 4000 8000 20000; do
@@ -228,10 +227,32 @@ done
 Take-aways:
 
 - **Brute force** is fine up through `N ≈ 16` (sub-millisecond), but the `O(N!!)` factorial blowup is brutal: `N = 20` already takes ~8 ms per call, and each step of two doubles that.
-- **DP** has by far the smallest constants — it beats both MS variants for every `N ≤ 50` and is competitive up to `N ≈ 100`. Past that, its `O(N³)` scaling dominates: `N = 1000` takes ~74 ms per match, `N = 2000` approaches one second, and `N = 4000` projects to ~10 s. We skip DP above `N = 2000` in this table.
-- **MS (simple-scan)** beats **MS (SMAWK)** by a small constant factor up to roughly `N ≈ 1500`. SMAWK's recursion + vector-allocation overhead has not yet paid for itself at those sizes.
-- Around `N ≈ 2000` SMAWK overtakes the simple scan, and the `log N` advantage compounds: ~2.3× faster at `N = 4000`, ~4.5× at `N = 8000`, and ~13× at `N = 20000`.
+- **DP** has the smallest constants for `N ≤ 20` (sub-microsecond) and still tracks the MS variants up to about `N ≈ 30`. Past that its `O(N³)` scaling dominates: `N = 1000` takes ~53 ms per match, `N = 2000` approaches half a second. We skip DP above `N = 2000`.
+- **MS (simple-scan)** is the smallest-constant algorithm in the sweet spot roughly `N ≈ 30 .. 400` — its `O(N²)` inner loop is just a tight pair of nested `for`s and it has essentially no per-recursion-level overhead. It beats DP from `N ≈ 30` upward.
+- Around `N ≈ 500` SMAWK overtakes the simple scan, and the `log N` advantage compounds: ~1.8× faster at `N = 1000`, ~5.1× at `N = 4000`, and ~32× at `N = 20000`.
 - Both MS variants finish a `N = 20000` matching in well under 200 ms — DP would take hours on the same input.
+
+### Implementation notes (performance)
+
+A first-pass implementation of MS in this style is dominated by allocator
+traffic: `find_matching_rec` builds fresh `std::vector<size_t>` halves at every
+recursion level, and SMAWK builds fresh `std::vector<int>` row / column /
+result vectors at every one of its `O(log N)` internal levels. On a profile of
+`N = 8000`, hundreds of samples per second land inside `operator new` /
+`_xzm_free`. The current implementation avoids this by allocating one
+thread-local `Scratch` struct per top-level call and reusing pre-grown buffers
+for the matching recursion, the SMAWK recursion, and the conquer phase's
+`u`, `v`, `g1`, `g2`, `alive`, etc. Index ranges (pointer + length) replace
+the copied `P1` / `P2` slices, and a flat `combined_pts[]` array replaces the
+per-access "is it in R or in L?" branch inside the conquer phase's inner
+distance lookup. Together these moved the SMAWK crossover from `N ≈ 1500`
+down to `N ≈ 500` and made MS competitive with DP at `N ≈ 30`.
+
+Interval DP gets one big asymptotic win on top of the layout cleanup: the
+inner triple loop only depends on `(i, k)`, not `j`, so the
+`distance(points[i], points[k])` call can be hoisted out by precomputing the
+full upper-triangular distance table once. That drops the sqrt count from
+`O(N³)` to `O(N²)`, roughly doubling DP throughput at `N = 2000`.
 
 ## License
 
